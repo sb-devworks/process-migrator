@@ -12,18 +12,19 @@ export class Utility {
     /** Convert from WITProcess FieldModel to WITProcessDefinitions FieldModel
      * @param fieldModel 
      */
-    public static WITProcessToWITProcessDefinitionsFieldModel(fieldModel: WITProcessInterfaces.FieldModel): WITProcessDefinitionsInterfaces.FieldModel {
-
-        let outField: WITProcessDefinitionsInterfaces.FieldModel = {
-            description: fieldModel.description,
-            id: fieldModel.id,
-            name: fieldModel.name,
-            type: fieldModel.isIdentity ? WITProcessDefinitionsInterfaces.FieldType.Identity : fieldModel.type,
-            url: fieldModel.url,
-            pickList: null
-        }
-        return outField;
-    }
+public static WITProcessToWITProcessDefinitionsFieldModel(fieldModel: WITProcessInterfaces.FieldModel): WITProcessDefinitionsInterfaces.FieldModel {
+    const outField: WITProcessDefinitionsInterfaces.FieldModel = {
+        description: fieldModel.description || "",
+        id: null as any,
+        name: fieldModel.name,
+        type: fieldModel.isIdentity
+            ? WITProcessDefinitionsInterfaces.FieldType.Identity
+            : fieldModel.type,
+        url: null as any,
+        pickList: null as any
+    };
+    return outField;
+}
 
     /** Convert from WorkItemTrackingProcess FieldType to WorkItemTracking FieldType
      * @param witProcessFieldType 

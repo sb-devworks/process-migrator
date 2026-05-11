@@ -78,12 +78,12 @@ export class ProcessImporter {
                     const picklistId = payload.targetAccountInformation.fieldRefNameToPicklistId[sourceField.id];
                     assert(picklistId !== PICKLIST_NO_ACTION, "[Unexpected] We are creating the field which we found the matching field earlier on collection")
                     createField.pickList = {
-                        id: picklistId,
-                        isSuggested: null,
-                        name: null,
-                        type: null,
-                        url: null
-                    };
+    id: picklistId,
+    isSuggested: false,
+    name: "",
+    type: "",
+    url: ""
+} as any;
                 }
                 outputFields.push(createField);
             }
@@ -98,13 +98,20 @@ export class ProcessImporter {
         if (fieldsToCreate.length > 0) {
             for (const field of fieldsToCreate) {
                 try {
-                    const fieldCreated = await Engine.Task(() => this._witProcessDefinitionApi.createField(field, payload.process.typeId), `Create field '${field.id}'`);
-                    if (!fieldCreated) {
-                        throw new ImportError(`Create field '${field.name}' failed, server returned empty object`);
-                    }
-                    if (fieldCreated.id !== field.id) {
-                        throw new ImportError(`Create field '${field.name}' actually returned referenace name '${fieldCreated.id}' instead of anticipated '${field.id}', are you on latest VSTS?`);
-                    }
+                    logger.logVerbose(`Create field payload: ${JSON.stringify(field, null, 2)}`);
+
+const fieldCreated = await Engine.Task(
+    () => this._witProcessDefinitionApi.createField(field, payload.process.typeId),
+    `Create field '${field.name}'`
+);
+
+if (!fieldCreated || !fieldCreated.id) {
+    throw new ImportError(`Create field '${field.name}' failed, server returned empty object or id.`);
+}
+
+// Keep the generated values on the local object for logging/debugging
+field.id = fieldCreated.id;
+field.url = fieldCreated.url;
 
                 }
                 catch (error) {
